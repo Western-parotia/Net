@@ -25,12 +25,7 @@ class HomeActivity : BaseActivity() {
 
     override fun getContentVB(): ViewBinding = viewBinding
 
-    private lateinit var homeVM: HomeVM
-
-    override fun initViewModel() {
-        super.initViewModel()
-        homeVM = getActivityVM(HomeVM::class.java)
-    }
+    private val homeVM by lazyActivityVM<HomeVM>()
 
     private val adapter = NewsAdapter()
     override fun init(savedInstanceState: Bundle?) {

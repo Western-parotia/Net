@@ -3,6 +3,7 @@ package com.foundation.app.simple.demo.domain
 import android.os.Bundle
 import android.util.Log
 import androidx.viewbinding.ViewBinding
+import com.foundation.app.simple.BuildConfig
 import com.foundation.app.simple.architecture.BaseActivity
 import com.foundation.app.simple.databinding.ActDynamicDomainBinding
 import com.foundation.app.simple.log
@@ -24,19 +25,18 @@ class DynamicDomainActivity : BaseActivity() {
     override fun getContentVB(): ViewBinding = vb
 
     override fun init(savedInstanceState: Bundle?) {
-
+        val okHttpClient = OkHttpClient.Builder().addDynamicDomainSkill()
+            .addInterceptor(HttpLoggingInterceptor(HttpLoggingInterceptor.Logger {
+                Log.i("domain==", it)
+            }).apply {
+                level = HttpLoggingInterceptor.Level.BODY
+            })
+            .build()
         val retrofit = Retrofit.Builder()
-            .client(
-                OkHttpClient.Builder().addDynamicDomainSkill()
-                    .addInterceptor(HttpLoggingInterceptor(HttpLoggingInterceptor.Logger {
-                        Log.i("domain==", it)
-                    }).apply {
-                        level = HttpLoggingInterceptor.Level.BODY
-                    })
-                    .build()
-            )
+            .client(okHttpClient)
             .baseUrl("https://www.baidu.com")
             .build()
+        NetManager.init(retrofit, application, BuildConfig.DEBUG)
 
         NetManager.addUrlChangedListener(object : OnUrlChanged {
             override fun onUrlChangeBefore(oldUrl: HttpUrl?, domainName: String?) {
