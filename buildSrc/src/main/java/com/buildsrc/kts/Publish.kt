@@ -1,5 +1,6 @@
 package com.buildsrc.kts
 
+import org.gradle.api.Project
 import java.io.File
 
 
@@ -36,22 +37,30 @@ object Publish {
     }
 
     object Maven {
-        const val groupId = "com.foundation.app"
-        const val artifactId = "activity-fragment"
-
-        val codingArtifactsRepoUrl: String
-        val codingArtifactsGradleUsername: String
-        val codingArtifactsGradlePassword: String
-
-        init {
-            val pFile = File("local.properties")
-            codingArtifactsRepoUrl = getProperties(pFile, "codingArtifactsRepoUrl")
-            codingArtifactsGradleUsername = getProperties(pFile, "codingArtifactsGradleUsername")
-            codingArtifactsGradlePassword = getProperties(pFile, "codingArtifactsGradlePassword")
-            "url=$codingArtifactsRepoUrl userName=$codingArtifactsGradleUsername pwd=$codingArtifactsGradlePassword".log(
-                "Publish config=========:"
-            )
+        const val groupId = "com.foundation.service"
+        const val artifactId = "net"
+        private const val fileName = "local.properties"
+        fun getCodingRepoUrl(project: Project): String {
+            val pFile = File("${project.rootDir}/$fileName")
+            val url = getProperties(pFile, "codingArtifactsRepoUrl")
+            "url $url".log("Maven===")
+            return url
         }
+
+        fun getCodingMavenUsername(project: Project): String {
+            val pFile = File("${project.rootDir}/$fileName")
+            val userName = getProperties(pFile, "codingArtifactsGradleUsername")
+            "userName $userName".log("Maven===")
+            return userName
+        }
+
+        fun getCodingMavenPassword(project: Project): String {
+            val pFile = File("${project.rootDir}/$fileName")
+            val pw = getProperties(pFile, "codingArtifactsGradlePassword")
+            "pw $pw".log("Maven===")
+            return pw
+        }
+
     }
 
 }

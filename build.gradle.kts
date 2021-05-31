@@ -22,6 +22,13 @@ allprojects {
         google()
         jcenter()
         maven { setUrl("https://jitpack.io") }
+        maven {
+            setUrl(com.buildsrc.kts.Publish.Maven.getCodingRepoUrl(project))
+            credentials {
+                username = com.buildsrc.kts.Publish.Maven.getCodingMavenUsername(project)
+                password = com.buildsrc.kts.Publish.Maven.getCodingMavenPassword(project)
+            }
+        }
     }
 }
 
