@@ -43,7 +43,6 @@ dependencies {
     implementation(Dependencies.Kotlin.kotlin_stdlib)
     implementation(Dependencies.JetPack.core_ktx)
     implementation(Dependencies.Retrofit.retorifit)
-    implementation(Dependencies.Retrofit.url_manager)
     implementation(Dependencies.Coroutines.coroutines_android)
     implementation(Dependencies.Retrofit.gson)
     implementation(Dependencies.JetPack.lifecycle_liveData_ktx)

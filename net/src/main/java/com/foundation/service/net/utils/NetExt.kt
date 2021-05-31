@@ -6,8 +6,8 @@ import android.util.Log
 import androidx.core.content.ContextCompat
 import com.foundation.service.net.NetException
 import com.foundation.service.net.NetManager
+import com.foundation.service.urlmanager.retrofiturlmanager.RetrofitUrlManager
 import com.google.gson.JsonSyntaxException
-import me.jessyan.retrofiturlmanager.RetrofitUrlManager
 import okhttp3.OkHttpClient
 import org.json.JSONException
 import retrofit2.HttpException

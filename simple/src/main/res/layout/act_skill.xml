@@ -10,5 +10,10 @@
         android:text="vm repo 网络示例"
         android:layout_height="wrap_content" />
 
+    <Button
+        android:id="@+id/btn_domain"
+        android:layout_width="wrap_content"
+        android:text="域名切换演示"
+        android:layout_height="wrap_content" />
 
 </LinearLayout>

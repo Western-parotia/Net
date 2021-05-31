@@ -82,5 +82,6 @@ dependencies {
     implementation(Dependencies.UI.BaseRecyclerViewAdapterHelper)
     implementation("com.foundation.app:activity-fragment:1.0-SNAPSHOT")
     implementation(project(":net"))
+    implementation("com.squareup.okhttp3:logging-interceptor:3.14.9")
 
 }

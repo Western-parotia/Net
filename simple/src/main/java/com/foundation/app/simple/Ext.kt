@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Intent
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import com.foundation.app.arc.BuildConfig
 import com.foundation.app.simple.utils.Utils
 
 /**
@@ -18,6 +17,11 @@ internal fun String.log(secTag: String = "") {
     if (BuildConfig.DEBUG) {
         println("$TAG $secTag $this")
     }
+}
+
+inline fun <reified T> Activity.jump() {
+    val intent = Intent(this, T::class.java)
+    startActivity(intent)
 }
 
 fun Activity.jump(clz: Class<out Activity>) {

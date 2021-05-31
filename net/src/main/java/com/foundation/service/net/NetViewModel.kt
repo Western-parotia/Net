@@ -11,6 +11,7 @@ import kotlinx.coroutines.*
 import retrofit2.Response
 
 /**
+ * 链式处理请求解析 业务>Retrofit>netIo
  * 网络加载状态监听
  * 异常捕获与分类
  * create by zhusw on 5/25/21 15:19
@@ -28,8 +29,7 @@ open class NetViewModel : ViewModel() {
      * 统一处理状态满足匹配UI展示需要
      *
      * 异常捕获：不管是 withContext(IO) 还是 async(IO) 中发生的异常，最终都会
-     * 在根协程的线程环境获取到异常信息。赞！
-     *
+     * 在根协程的线程环境获取到异常信息。
      */
     fun netLaunch(
         block: suspend CoroutineScope.() -> Unit,
@@ -69,7 +69,6 @@ open class NetViewModel : ViewModel() {
         }
     }
 
-    //需要测试异常线程
     protected suspend fun <T> withIO(block: suspend () -> T): T {
         return withContext(Dispatchers.IO) {//异常信息 将在根协程的线程环境捕获
             block.invoke()

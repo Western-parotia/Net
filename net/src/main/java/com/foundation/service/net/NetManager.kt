@@ -1,30 +1,53 @@
 package com.foundation.service.net
 
 import android.app.Application
-import me.jessyan.retrofiturlmanager.RetrofitUrlManager
+import com.foundation.service.urlmanager.retrofiturlmanager.RetrofitUrlManager
+import com.foundation.service.urlmanager.retrofiturlmanager.onUrlChangeListener
+import okhttp3.HttpUrl
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
- * 网络管理器：init 之后 可获取 apiService,并对其进行缓存优化内存
- * 支持全局动态修改域名
+ * 网络管理器：init 之后 可获取 apiService
+ * 提供接口对象缓存
+ * 动态域名替换，替换解雇监听
  * @see [more_Introduction]("http://xx.com")
  * create by zhusw on 5/25/21 10:52
  */
 object NetManager : INetManagerSkill {
+    private val onUrlChangedList = arrayListOf<OnUrlChanged>()
+    private val onUrlChanged = object : OnUrlChanged {
+        override fun onUrlChangeBefore(oldUrl: HttpUrl?, domainName: String?) {
+            onUrlChangedList.forEach {
+                it.onUrlChangeBefore(oldUrl, domainName)
+            }
+        }
+
+        override fun onUrlChanged(newUrl: HttpUrl?, oldUrl: HttpUrl?) {
+            onUrlChangedList.forEach {
+                it.onUrlChanged(newUrl, oldUrl)
+            }
+        }
+    }
+
     internal var debug = BuildConfig.DEBUG
         private set
     private val skill: INetManagerSkill by lazy {
-        UrkSkill()
+        UrkSkill(onUrlChanged)
     }
 
     private lateinit var retrofit: Retrofit
 
     private val initState = AtomicBoolean(false)
-    lateinit var app: Application
+    internal lateinit var app: Application
         private set
     private val cacheMap by lazy {
         mutableMapOf<Class<*>, Any>()
+    }
+
+    fun addDynamicDomainSkill(build: OkHttpClient.Builder): OkHttpClient.Builder {
+        return RetrofitUrlManager.getInstance().with(build)
     }
 
     /**
@@ -62,11 +85,24 @@ object NetManager : INetManagerSkill {
         return service as T
     }
 
+    fun addUrlChangedListener(o: OnUrlChanged): Boolean {
+        return onUrlChangedList.add(o)
+    }
 
+    fun removeChangedListener(o: OnUrlChanged): Boolean {
+        return onUrlChangedList.remove(o)
+    }
+
+    /**
+     * 按key 替换域名
+     */
     override fun putDomain(domainKey: String, domainUrl: String) {
         skill.putDomain(domainKey, domainUrl)
     }
 
+    /**
+     * 替换全局域名
+     */
     override fun setGlobalDomain(domain: String) {
         skill.setGlobalDomain(domain)
     }
@@ -77,7 +113,12 @@ inline fun <reified T : Any> NetManager.getApiService(): T {
     return getApiService(T::class.java)
 }
 
-internal class UrkSkill : INetManagerSkill {
+internal class UrkSkill(onUrlChanged: OnUrlChanged) : INetManagerSkill {
+
+    init {
+        RetrofitUrlManager.getInstance().registerUrlChangeListener(onUrlChanged)
+    }
+
     override fun putDomain(domainKey: String, domainUrl: String) {
         RetrofitUrlManager.getInstance().putDomain(domainKey, domainUrl)
     }
@@ -87,3 +128,5 @@ internal class UrkSkill : INetManagerSkill {
     }
 
 }
+
+interface OnUrlChanged : onUrlChangeListener

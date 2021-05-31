@@ -18,13 +18,15 @@
         android:name=".CustomApplication"
         android:theme="@style/Theme.LoadingViewGroup">
         <activity
-            android:name=".demo.home.HomeActivity"
+            android:name=".demo.skill.SkillMenuActivity"
             android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".demo.home.HomeActivity" />
+        <activity android:name=".demo.domain.DynamicDomainActivity" />
     </application>
 
 </manifest>
