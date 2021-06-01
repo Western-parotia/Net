@@ -13,7 +13,7 @@
 
 功能结构图：
 
-![结构图](/images/功能结构图.jpg)
+![结构图](/images/function_structure.jpg) 
 
 基于场景的特殊性，可单独展示的API非常少，建议直接查看应用示范代码
 
