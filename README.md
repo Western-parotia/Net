@@ -15,6 +15,13 @@
 
 ![结构图](images/function_structure.jpg) 
 
+使用：
+
+```kotlin
+ implementation("com.foundation.service:net:最新版本")
+```
+
+
 基于场景的特殊性，可单独展示的API非常少，建议直接查看应用示范代码
 
 NetViewModel 详细使用请参考 `HomeVM`类
