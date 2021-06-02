@@ -12,8 +12,7 @@ import com.foundation.service.net.NetStateListener
 class WanAndroidNetStateHandler(
     private val control: Boolean = false,
     private val stateLiveData: MutableLiveData<NetLoadingEvent>
-) :
-    NetStateListener {
+) : NetStateListener {
     override fun onStart() {
         if (control) {
             stateLiveData.value = NetLoadingEvent.START
