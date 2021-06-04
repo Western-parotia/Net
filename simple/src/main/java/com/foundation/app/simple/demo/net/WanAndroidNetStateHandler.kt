@@ -5,7 +5,6 @@ import com.foundation.app.simple.log
 import com.foundation.service.net.NetException
 import com.foundation.service.net.NetLoadingEvent
 import com.foundation.service.net.NetStateListener
-import java.util.concurrent.CancellationException
 
 /**
  * create by zhusw on 5/26/21 14:06
@@ -28,10 +27,6 @@ class WanAndroidNetStateHandler(
 
     override fun onFailure(e: Throwable) {
         handlerNetException(e)
-    }
-
-    override fun onCancel(cause: CancellationException) {
-        handlerNetException(cause)
     }
 
     private fun handlerNetException(e: Throwable) {

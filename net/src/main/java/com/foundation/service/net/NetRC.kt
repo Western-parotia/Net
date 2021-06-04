@@ -13,11 +13,11 @@ import retrofit2.Response
  */
 object NetRC {
     private const val TAG = "NetRC"
-    private val normalScope = CoroutineScope(SupervisorJob())
     private val uiDispatcher = Dispatchers.Main.immediate
     private val ioDispatcher = Dispatchers.IO
 
     /**
+     * 回调在主线程
      * block 作为匿名协程拓展，具备包含子协程的能力
      * 但应该完全避免其中包含独立协程（任何情况下，都不应该使用独立协程嵌套，这样会丧失"父子"协程的控制）
      * [NetStateListener] 作为状态监听器，通常你应该自己实现一个子类，
@@ -35,9 +35,9 @@ object NetRC {
         block: suspend CoroutineScope.() -> Unit,
         state: NetStateListener? = null,
         tag: String = "",
-        appointScope: CoroutineScope? = null
+        appointScope: CoroutineScope
     ): Job {
-        return launch(block, state, tag, appointScope ?: normalScope, uiDispatcher)
+        return launch(block, state, tag, appointScope, uiDispatcher)
     }
 
     /**
@@ -52,9 +52,9 @@ object NetRC {
         block: suspend CoroutineScope.() -> Unit,
         state: NetStateListener? = null,
         tag: String = "",
-        appointScope: CoroutineScope? = null
+        appointScope: CoroutineScope
     ): Job {
-        return launch(block, state, tag, appointScope ?: normalScope, ioDispatcher)
+        return launch(block, state, tag, appointScope, ioDispatcher)
     }
 
     private fun launch(
@@ -68,12 +68,8 @@ object NetRC {
             throwable.printStackTrace()
             val name: String? = ctx[CoroutineName]?.name
             "$throwable ,ctxName:$name ,thread:${Thread.currentThread().name}".log(TAG)
-            if (throwable is CancellationException) {
-                state?.onCancel(throwable)
-            } else {
-                val transformThrowable = transformHttpException(throwable)
-                state?.onFailure(transformThrowable)
-            }
+            val transformThrowable = transformHttpException(throwable)
+            state?.onFailure(transformThrowable)
         }
         val ctx = if (tag.isNotEmpty()) {
             exHandler + CoroutineName(tag)
@@ -104,13 +100,13 @@ object NetRC {
     }
 
     suspend fun <T> withIO(block: suspend () -> T): T {
-        return withContext(Dispatchers.IO) {//异常信息 将在根协程的线程环境捕获
+        return withContext(ioDispatcher) {//异常信息 将在根协程的线程环境捕获
             block.invoke()
         }
     }
 
     suspend fun <T> withUI(block: suspend () -> T): T {
-        return withContext(Dispatchers.Main) {
+        return withContext(uiDispatcher) {
             block.invoke()
         }
     }
