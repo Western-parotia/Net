@@ -23,16 +23,15 @@ class HomeVM : BaseWanAndroidVM() {
     private val _bannerData = MutableLiveData<List<BannerEntity>>()
     val bannerData: LiveData<List<BannerEntity>> = _bannerData
 
-
     private val _newsLiveData = MutableLiveData<List<NewsFeedInfo>>()
     val newsLiveData: LiveData<List<NewsFeedInfo>> = _newsLiveData
 
     fun loadBanner() {
         netLaunch({
-            val data = withBusiness {
-                homeRepo.homeApi.getBanner()
+            val data = homeRepo.getBanner()
+            data?.let {
+                _bannerData.value = it
             }
-            _bannerData.value = data
         }, WanAndroidNetStateHandler(true, _loadEventLiveData), "加载 banner")
     }
 

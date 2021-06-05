@@ -8,7 +8,7 @@ import retrofit2.Response
 
 
 /**
- * 基于 Retrofit+Coroutine的网络请求框架
+ * 基于 协程的网络请求框架
  * create by zhusw on 6/4/21 18:10
  */
 object NetRC {

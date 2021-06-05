@@ -14,12 +14,7 @@ import com.foundation.app.simple.demo.home.data.NewsFeedInfo
 import com.foundation.app.simple.log
 import com.foundation.app.simple.toast
 import com.foundation.service.net.NetLoadingEvent
-import com.foundation.service.net.NetRC
-import com.foundation.service.net.NetStateListener
 import com.foundation.widget.loading.NormalLoadingAdapter
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.delay
 
 /**
  * create by zhusw on 5/20/21 11:33
@@ -53,34 +48,6 @@ class HomeActivity : BaseActivity() {
         viewBinding.btnListNew.setOnClickListener {
             homeVM.loadNews(true)
         }
-        /* 以下未测试代码啊，开发中应避免在Activity中使用NetRc
-         */
-        var job: Job? = null
-        viewBinding.btnLongTime.setOnClickListener {
-            job = NetRC.uiLaunch({
-                NetRC.withIO {
-                    delay(10_000)
-                }
-                "btnLongTime run finished".log("btnLongTime--")
-            }, object : NetStateListener {
-                override fun onStart() {
-                    "onStart: ".log("btnLongTime--")
-                }
-
-                override fun onSuccess() {
-                    "onSuccess: ".log("btnLongTime--")
-                }
-
-                override fun onFailure(e: Throwable) {
-                    "onFailure: $e".log("btnLongTime--")
-                }
-            }, appointScope = MainScope())
-        }
-        viewBinding.btnCancel.setOnClickListener {
-            "btnCancel job? $job".log("btnLongTime--")
-            job?.cancel()
-        }
-
     }
 
     override fun bindData() {

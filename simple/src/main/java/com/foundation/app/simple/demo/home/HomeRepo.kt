@@ -1,7 +1,9 @@
 package com.foundation.app.simple.demo.home
 
+import com.foundation.app.simple.demo.home.data.BannerEntity
 import com.foundation.app.simple.demo.net.api.WanAndroidService
 import com.foundation.service.net.NetManager
+import com.foundation.service.net.NetRC
 import com.foundation.service.net.getApiService
 
 /**
@@ -9,4 +11,11 @@ import com.foundation.service.net.getApiService
  */
 class HomeRepo {
     val homeApi = NetManager.getApiService<WanAndroidService>()
+
+    suspend fun getBanner(): List<BannerEntity>? {
+        return NetRC.withIO {
+            homeApi.getBanner().body()?.data
+        }
+    }
+
 }
