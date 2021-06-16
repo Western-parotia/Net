@@ -1,7 +1,5 @@
 package com.foundation.service.net
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineScope
@@ -15,8 +13,6 @@ import retrofit2.Response
  */
 open class NetViewModel : ViewModel() {
     private val TAG = "NetViewModel"
-    protected val _loadEventLiveData = MutableLiveData<NetLoadingEvent>()
-    val loadEventLiveData: LiveData<NetLoadingEvent> = _loadEventLiveData
 
     /**
      * 使用viewModelScope 协程

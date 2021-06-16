@@ -65,7 +65,6 @@ object NetRC {
         dispatcher: CoroutineDispatcher
     ): Job {
         val exHandler = CoroutineExceptionHandler { ctx, throwable ->
-            throwable.printStackTrace()
             val name: String? = ctx[CoroutineName]?.name
             "$throwable ,ctxName:$name ,thread:${Thread.currentThread().name}".log(TAG)
             val transformThrowable = transformHttpException(throwable)
