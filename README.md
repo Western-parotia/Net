@@ -3,33 +3,88 @@
 基于kotlin+协程封装的网络请求库。结合NetViewModel获取请求状态监听，状态判断。分层处理业务数据。
 
 
-
-
 核心功能：
 
 * 1.service快速创建（带缓存）
 * 2.NetViewModel，网络状态拦截，数据状态拦截，异常捕获 
-* 3.动态切换域名
+* 3.域名切换 包含静态多域名 与动态多域名
 
 功能结构图：
 
 ![结构图](images/function_structure.jpg) 
 
-使用：
+引用：
 
 ```kotlin
  implementation("com.foundation.service:net:最新版本")
 ```
 
 
-基于协程的封装，侵入性极低，只要会用协程，即可直接使用。
+基于协程的封装，侵入性极低，需要具备协程基础使用的知识。
 
+会创建协程，会切分线程即可。
 
-NetViewModel 详细使用请参考 `HomeVM`类
 
 域名切换源码为开源库`RetrofitUrlManager`，[点击直达源码仓库](https://github.com/JessYanCoding/RetrofitUrlManager/blob/master/README-zh.md)
 
-## 快速使用：
+
+
+## 一、运行时切换域名使用示例：
+
+* 1.1 为Okhttp添加指定拦截器
+
+```kotlin
+OkHttpClient.Builder().addDynamicDomainSkill()
+```
+或者
+
+```kotlin
+NetManager.addDynamicDomainSkill(okhttpBuilder)
+```
+
+* 1.2 切换指定了`Domain-Name header`的接口的域名
+
+前置：必须要设置`Domain-Name header`
+
+```kotlin
+    @Headers("Domain-Name: searchDomain")//searchDomain 是替换域名时用于匹配接口的KEY
+    @GET("/")
+    suspend fun specialSearch(): Response<ResponseBody>
+```
+切换
+
+```kotlin
+ NetManager.putDomain("searchDomain","https://www.bing.com")
+```
+
+* 1.3 全局切换`BaseUrl`
+
+
+```kotlin
+ NetManager.setGlobalDomain("https://www.baidu.com")
+```
+
+
+切换时的优先级最低与`Domain-Name header` 只会切换所有没指定`Domain-Name header`的接口
+
+被替换掉的`BaseUrl`就是下面代码中设置的`baseUrl `参数
+
+```kotlin
+
+ val retrofit = Retrofit.Builder()
+            .client(okHttpClient)
+            .baseUrl("https://www.google.com")
+            .build()
+
+```
+
+
+
+
+
+
+
+## 二、网络请求使用示例：
 
 * 1、初始化
 
@@ -91,9 +146,9 @@ NetViewModel 详细使用请参考 `HomeVM`类
 
 ```
 
-## 核心类：
+## 三、核心类：
 
-### 一、NetRC
+### 3.1 NetRC
 网络请求
 
 ```kotlin
@@ -134,7 +189,7 @@ NetViewModel 详细使用请参考 `HomeVM`类
         appointScope: CoroutineScope
     )
 ```
-### 二、NetLinkErrorType
+### 3.2 NetLinkErrorType
 
 ```kotlin
     //默认异常状态，通常是发生在收到网络数据后，处理数据时异常：比如 json 解析出错

@@ -80,6 +80,8 @@ dependencies {
     implementation(Dependencies.Retrofit.retorifit)
     implementation(Dependencies.Retrofit.converter_gson)
     implementation(Dependencies.UI.BaseRecyclerViewAdapterHelper)
+    implementation(Dependencies.Glide.compiler)
+    implementation(Dependencies.Glide.glide)
     implementation("com.foundation.app:activity-fragment:1.0-SNAPSHOT")
     implementation(project(":net"))
     implementation("com.squareup.okhttp3:logging-interceptor:3.14.9")

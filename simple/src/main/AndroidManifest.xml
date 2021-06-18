@@ -26,7 +26,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".demo.home.HomeActivity" />
-        <activity android:name=".demo.domain.DynamicDomainActivity" />
+        <activity android:name=".demo.domain.ModifyGlobalDomainActivity" />
+        <activity android:name=".demo.domain.ModifySpecialDomainActivity" />
     </application>
 
 </manifest>

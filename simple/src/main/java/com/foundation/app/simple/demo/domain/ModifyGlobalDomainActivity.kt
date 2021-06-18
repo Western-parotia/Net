@@ -17,38 +17,37 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 
 /**
+ * 修改全局域名
  * create by zhusw on 5/31/21 16:03
  */
-class DynamicDomainActivity : BaseActivity() {
+class ModifyGlobalDomainActivity : BaseActivity() {
 
     val vb by lazyVB<ActDynamicDomainBinding>()
     override fun getContentVB(): ViewBinding = vb
 
     override fun init(savedInstanceState: Bundle?) {
         val okHttpClient = OkHttpClient.Builder().addDynamicDomainSkill()
-            .addInterceptor(HttpLoggingInterceptor(HttpLoggingInterceptor.Logger {
+            .addInterceptor(HttpLoggingInterceptor {
                 Log.i("domain==", it)
-            }).apply {
+            }.apply {
                 level = HttpLoggingInterceptor.Level.BODY
             })
             .build()
         val retrofit = Retrofit.Builder()
             .client(okHttpClient)
-            .baseUrl("https://www.baidu.com")
+            .baseUrl("https://www.sogou.com/")
             .build()
         NetManager.init(retrofit, application, BuildConfig.DEBUG)
 
         NetManager.addUrlChangedListener(object : OnUrlChanged {
             override fun onUrlChangeBefore(oldUrl: HttpUrl?, domainName: String?) {
                 MainScope().launch {
-                    vb.etRes.setText("url 将改变")
+                    vb.etRes.setText("将改变 urlKey:$domainName")
+                    vb.etResSpecial.setText("将改变 urlKey:$domainName")
                 }
             }
 
             override fun onUrlChanged(newUrl: HttpUrl?, oldUrl: HttpUrl?) {
-                MainScope().launch {
-                    vb.tvDomain.text = "当前url:${newUrl?.url()}"
-                }
             }
         })
 
@@ -60,8 +59,8 @@ class DynamicDomainActivity : BaseActivity() {
             }
             MainScope().launch(exHandler) {
                 val res = withContext(Dispatchers.IO) {
-                    retrofit.create(SearchApi::class.java)
-                        .search()
+                    retrofit.create(GlobalSearchApi::class.java)
+                        .globalSearch()
                 }
 
                 val request = res.raw().request()
@@ -81,6 +80,37 @@ class DynamicDomainActivity : BaseActivity() {
             NetManager.setGlobalDomain("https://www.bing.com")
         }
 
+        //-----------------special-----------------
+
+        vb.btnRequestSpecial.setOnClickListener {
+            vb.etResSpecial.setText("准备请求")
+            val exHandler = CoroutineExceptionHandler { coroutineContext, throwable ->
+                "eror:${throwable.message}".log("domain====")
+                throwable.printStackTrace()
+            }
+            MainScope().launch(exHandler) {
+                val res = withContext(Dispatchers.IO) {
+                    retrofit.create(GlobalSearchApi::class.java)
+                        .specialSearch()
+                }
+
+                val request = res.raw().request()
+                vb.etResSpecial.setText(
+                    "请求url:${request.url()}" +
+                            " \n " +
+                            "body=${res.body()?.string()}"
+                )
+            }
+
+        }
+
+        vb.btnBaiduSpecial.setOnClickListener {
+            NetManager.putDomain(GlobalSearchApi.DOMAIN_KEY_SEARCH, "https://www.baidu.com")
+        }
+        vb.btnBingSpecial.setOnClickListener {
+            NetManager.putDomain(GlobalSearchApi.DOMAIN_KEY_SEARCH, "https://www.bing.com")
+
+        }
     }
 
     override fun bindData() {

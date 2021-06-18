@@ -16,7 +16,12 @@
         android:editable="false"
         android:text="响应内容："
         android:layout_width="match_parent"
-        android:layout_height="400dp" />
+        android:layout_height="200dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:text="全局切换BaseUrl"
+        android:layout_height="wrap_content" />
 
     <LinearLayout
         android:orientation="horizontal"
@@ -25,7 +30,7 @@
 
         <Button
             android:id="@+id/btn_request"
-            android:text="访问"
+            android:text="请求"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
@@ -41,4 +46,50 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
     </LinearLayout>
+
+
+    <TextView
+        android:id="@+id/tv_domain_special"
+        android:text="当前域名："
+        android:layout_marginTop="40dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <EditText
+        android:gravity="left"
+        android:id="@+id/et_res_special"
+        android:editable="false"
+        android:text="响应内容："
+        android:layout_width="match_parent"
+        android:layout_height="200dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:text="按KEY 切换BaseUrl"
+        android:layout_height="wrap_content" />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/btn_request_special"
+            android:text="访问"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:id="@+id/btn_bing_special"
+            android:text="bing.com"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:id="@+id/btn_baidu_special"
+            android:text="baidu.com"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
 </LinearLayout>

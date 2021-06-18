@@ -10,7 +10,7 @@ object Dependencies {
 
 
     object Foundation {
-        const val loading = "com.foundation.widget:loading:1.0-SNAPSHOT"
+        const val loading = "com.foundation.widget:loading:1.1"
     }
 
     object Kotlin {
@@ -69,4 +69,8 @@ object Dependencies {
 
     }
 
+    object Glide {
+        const val glide = "com.github.bumptech.glide:glide:4.10.0"
+        const val compiler = "com.github.bumptech.glide:compiler:4.10.0"
+    }
 }
