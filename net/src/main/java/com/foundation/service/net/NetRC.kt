@@ -9,6 +9,7 @@ import retrofit2.Response
 
 /**
  * 基于 协程的网络请求框架
+ * NetRequestCoroutine 简称 NetRC
  * create by zhusw on 6/4/21 18:10
  */
 object NetRC {
@@ -27,31 +28,26 @@ object NetRC {
      * 在根协程的线程环境获取到异常信息。
      * @param block
      * @param state
-     * @param tag
+     * @param tag 此次的协程任务名称
      * @param appointScope 如果未指定协程 则会创建一个新的[CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)] 协程
      * @return 如果未指定可自动取消的appointScope，则需要自主控制取消
      */
     fun uiLaunch(
         block: suspend CoroutineScope.() -> Unit,
-        state: NetStateListener? = null,
-        tag: String = "",
+        state: NetStateListener?,
+        tag: String?,
         appointScope: CoroutineScope
     ): Job {
         return launch(block, state, tag, appointScope, uiDispatcher)
     }
 
     /**
-     * 回调在子线程
-     * @param block
-     * @param state
-     * @param tag
-     * @param appointScope
-     * @return
+     * 参数同[uiLaunch] 一致，但是回调在子线程
      */
     fun ioLaunch(
         block: suspend CoroutineScope.() -> Unit,
-        state: NetStateListener? = null,
-        tag: String = "",
+        state: NetStateListener?,
+        tag: String?,
         appointScope: CoroutineScope
     ): Job {
         return launch(block, state, tag, appointScope, ioDispatcher)
@@ -60,7 +56,7 @@ object NetRC {
     private fun launch(
         block: suspend CoroutineScope.() -> Unit,
         state: NetStateListener? = null,
-        tag: String = "",
+        tag: String?,
         appointScope: CoroutineScope,
         dispatcher: CoroutineDispatcher
     ): Job {
@@ -70,13 +66,15 @@ object NetRC {
             val transformThrowable = transformHttpException(throwable)
             state?.onFailure(transformThrowable)
         }
-        val ctx = if (tag.isNotEmpty()) {
-            exHandler + CoroutineName(tag)
-        } else {
-            exHandler
-        }
+        val ctx = tag?.let {
+            if (it.isNotEmpty()) {
+                exHandler + CoroutineName(tag)
+            } else {
+                exHandler
+            }
+        } ?: exHandler
 
-        val job = appointScope.launch(ctx + dispatcher) {
+        return appointScope.launch(ctx + dispatcher) {
             if (!networkIsAvailable(NetManager.app)) {
                 throw NetException.createNetWorkType("网络链接不可用")
             }
@@ -84,10 +82,14 @@ object NetRC {
             block.invoke(this)
             state?.onSuccess()
         }
-        return job
     }
 
-
+    /**
+     * 将过滤网络请求是否成功
+     * @param T
+     * @param block
+     * @return
+     */
     suspend fun <T> withResponse(block: suspend () -> Response<T>): T? {
         val res = withIO(block) //Response<BaseApiResponse<List<YourData>>>
         return when {
