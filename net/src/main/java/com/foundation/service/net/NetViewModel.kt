@@ -20,8 +20,8 @@ open class NetViewModel : ViewModel() {
      */
     fun netLaunch(
         block: suspend CoroutineScope.() -> Unit,
-        state: NetStateListener? = null,
-        tag: String = ""
+        state: NetStateListener?,
+        tag: String?
     ) {
         NetRC.uiLaunch(block, state, tag, viewModelScope)
     }
