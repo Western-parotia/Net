@@ -82,7 +82,7 @@ dependencies {
     implementation(Dependencies.UI.BaseRecyclerViewAdapterHelper)
     implementation(Dependencies.Glide.compiler)
     implementation(Dependencies.Glide.glide)
-    implementation("com.foundation.app:activity-fragment:1.0-SNAPSHOT")
+    implementation("com.foundation.app:activity-fragment:1.0.0")
     implementation(project(":net"))
     implementation("com.squareup.okhttp3:logging-interceptor:3.14.9")
 
