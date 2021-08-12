@@ -27,12 +27,12 @@ class HomeVM : BaseWanAndroidVM() {
     val newsLiveData: LiveData<List<NewsFeedInfo>> = _newsLiveData
 
     fun loadBanner() {
-        netLaunch({
+        netLaunch(WanAndroidNetStateHandler(true, _loadEventLiveData), "加载 banner") {
             val data = homeRepo.getBanner()
             data?.let {
                 _bannerData.value = it
             }
-        }, WanAndroidNetStateHandler(true, _loadEventLiveData), "加载 banner")
+        }
     }
 
     private var pageCount = -1

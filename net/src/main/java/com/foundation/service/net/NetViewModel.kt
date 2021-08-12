@@ -18,12 +18,25 @@ open class NetViewModel : ViewModel() {
      * 使用viewModelScope 协程
      * 不需要取消
      */
+    @Deprecated(message = "使用另一个重载更丝滑", replaceWith = ReplaceWith("netLaunch(NetStateListener,String){\n}"))
     fun netLaunch(
         block: suspend CoroutineScope.() -> Unit,
         state: NetStateListener?,
         tag: String?
     ) {
-        NetRC.uiLaunch(block, state, tag, viewModelScope)
+        NetRC.uiLaunch(state, tag, viewModelScope, block)
+    }
+
+    /**
+     * 使用viewModelScope 协程
+     * 不需要取消
+     */
+    fun netLaunch(
+        state: NetStateListener?,
+        tag: String?,
+        block: suspend CoroutineScope.() -> Unit
+    ) {
+        NetRC.uiLaunch(state, tag, viewModelScope, block)
     }
 
     protected suspend fun <T> withResponse(block: suspend () -> Response<T>): T? {
