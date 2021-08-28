@@ -1,5 +1,7 @@
 package com.foundation.service.net
 
+import android.os.Handler
+import android.os.Looper
 import com.foundation.service.net.utils.log
 import com.foundation.service.net.utils.networkIsAvailable
 import com.foundation.service.net.utils.transformHttpException
@@ -13,6 +15,8 @@ import retrofit2.Response
  * create by zhusw on 6/4/21 18:10
  */
 object NetRC {
+    private val handler = Handler(Looper.getMainLooper())
+
     private const val TAG = "NetRC"
     private val uiDispatcher = Dispatchers.Main.immediate
     private val ioDispatcher = Dispatchers.IO
@@ -63,8 +67,10 @@ object NetRC {
         val exHandler = CoroutineExceptionHandler { ctx, throwable ->
             val name: String? = ctx[CoroutineName]?.name
             "$throwable ,ctxName:$name ,thread:${Thread.currentThread().name}".log(TAG)
-            val transformThrowable = transformHttpException(throwable)
-            state?.onFailure(transformThrowable)
+            handler.post {
+                val transformThrowable = transformHttpException(throwable)
+                state?.onFailure(transformThrowable)
+            }
         }
         val ctx = tag?.let {
             if (it.isNotEmpty()) {
