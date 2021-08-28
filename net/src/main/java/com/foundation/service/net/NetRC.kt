@@ -67,8 +67,12 @@ object NetRC {
         val exHandler = CoroutineExceptionHandler { ctx, throwable ->
             val name: String? = ctx[CoroutineName]?.name
             "$throwable ,ctxName:$name ,thread:${Thread.currentThread().name}".log(TAG)
-            handler.post {
-                val transformThrowable = transformHttpException(throwable)
+            val transformThrowable = transformHttpException(throwable)
+            if (Looper.myLooper() != Looper.getMainLooper()) {
+                handler.post {
+                    state?.onFailure(transformThrowable)
+                }
+            } else {
                 state?.onFailure(transformThrowable)
             }
         }
