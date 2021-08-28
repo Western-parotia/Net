@@ -37,10 +37,10 @@ object NetRC {
      * @return 如果未指定可自动取消的appointScope，则需要自主控制取消
      */
     fun uiLaunch(
-        block: suspend CoroutineScope.() -> Unit,
         state: NetStateListener?,
         tag: String?,
-        appointScope: CoroutineScope
+        appointScope: CoroutineScope,
+        block: suspend CoroutineScope.() -> Unit
     ): Job {
         return launch(block, state, tag, appointScope, uiDispatcher)
     }
@@ -49,10 +49,10 @@ object NetRC {
      * 参数同[uiLaunch] 一致，但是回调在子线程
      */
     fun ioLaunch(
-        block: suspend CoroutineScope.() -> Unit,
         state: NetStateListener?,
         tag: String?,
-        appointScope: CoroutineScope
+        appointScope: CoroutineScope,
+        block: suspend CoroutineScope.() -> Unit
     ): Job {
         return launch(block, state, tag, appointScope, ioDispatcher)
     }
