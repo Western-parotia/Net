@@ -85,10 +85,10 @@ object NetRC {
         } ?: exHandler
 
         return appointScope.launch(ctx + dispatcher) {
+            state?.onStart()
             if (!networkIsAvailable(NetManager.app)) {
                 throw NetException.createNetWorkType("网络链接不可用")
             }
-            state?.onStart()
             block.invoke(this)
             state?.onSuccess()
         }
