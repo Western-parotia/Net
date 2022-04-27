@@ -9,7 +9,9 @@ interface NetStateListener {
     fun onSuccess()
 
     @Deprecated("请重写2参的，带tag更方便使用")
-    fun onFailure(e: Throwable)
+    fun onFailure(e: Throwable) {
+    }
+
     fun onFailure(tagName: String?, e: Throwable) {
         onFailure(e)
     }
