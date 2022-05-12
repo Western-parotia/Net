@@ -10,7 +10,7 @@ object Dependencies {
 
 
     object Foundation {
-        const val loading = "com.foundation.widget:loading:1.1"
+        const val loading = "com.foundation.widget:loadingview:1.1.9"
     }
 
     object Kotlin {

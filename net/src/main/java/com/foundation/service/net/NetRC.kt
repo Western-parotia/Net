@@ -70,10 +70,10 @@ object NetRC {
             val transformThrowable = transformHttpException(throwable)
             if (Looper.myLooper() != Looper.getMainLooper()) {
                 handler.post {
-                    state?.onFailure(transformThrowable)
+                    state?.onFailure(tag, transformThrowable)
                 }
             } else {
-                state?.onFailure(transformThrowable)
+                state?.onFailure(tag, transformThrowable)
             }
         }
         val ctx = tag?.let {

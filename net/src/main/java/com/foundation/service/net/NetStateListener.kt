@@ -7,5 +7,12 @@ package com.foundation.service.net
 interface NetStateListener {
     fun onStart()
     fun onSuccess()
-    fun onFailure(e: Throwable)
+
+    @Deprecated("请重写2参的，带tag更方便使用")
+    fun onFailure(e: Throwable) {
+    }
+
+    fun onFailure(tagName: String?, e: Throwable) {
+        onFailure(e)
+    }
 }
