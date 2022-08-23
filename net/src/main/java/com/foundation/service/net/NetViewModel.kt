@@ -16,27 +16,23 @@ open class NetViewModel : ViewModel() {
 
     /**
      * 使用viewModelScope 协程
-     * 不需要取消
+     * @return 可自行取消
      */
     fun netLaunch(
         block: suspend CoroutineScope.() -> Unit,
         state: NetStateListener?,
         tag: String?
-    ) {
-        NetRC.uiLaunch(state, tag, viewModelScope, block)
-    }
+    ) = NetRC.uiLaunch(state, tag, viewModelScope, block)
 
     /**
      * 使用viewModelScope 协程
-     * 不需要取消
+     * @return 可自行取消
      */
     fun netLaunch(
         state: NetStateListener?,
         tag: String?,
         block: suspend CoroutineScope.() -> Unit
-    ) {
-        NetRC.uiLaunch(state, tag, viewModelScope, block)
-    }
+    ) = NetRC.uiLaunch(state, tag, viewModelScope, block)
 
     protected suspend fun <T> withResponse(block: suspend () -> Response<T>): T? {
         return NetRC.withResponse(block)
