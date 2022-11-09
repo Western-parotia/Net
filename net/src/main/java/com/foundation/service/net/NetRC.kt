@@ -66,7 +66,7 @@ object NetRC {
     ): Job {
         val exHandler = CoroutineExceptionHandler { ctx, throwable ->
             val name: String? = ctx[CoroutineName]?.name
-            "$throwable ,ctxName:$name ,thread:${Thread.currentThread().name}".log(TAG)
+            "ctxName:$name ,thread:${Thread.currentThread().name},$throwable ".log(TAG)
             val transformThrowable = transformHttpException(throwable)
             //针对UI线程场景发起协程，保持异常回调也回到UI线程
             if (dispatcher == uiDispatcher) {
@@ -79,14 +79,8 @@ object NetRC {
                 }
             }
         }
-        val ctx = tag?.let {
-            if (it.isNotEmpty()) {
-                exHandler + CoroutineName(tag)
-            } else {
-                exHandler
-            }
-        } ?: exHandler
 
+        val ctx = if (tag.isNullOrEmpty()) exHandler else exHandler + CoroutineName(tag)
         return appointScope.launch(ctx + dispatcher) {
             state?.onStart()
             if (!networkIsAvailable(NetManager.app)) {
