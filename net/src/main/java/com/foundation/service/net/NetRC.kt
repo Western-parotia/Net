@@ -62,18 +62,21 @@ object NetRC {
         state: NetStateListener? = null,
         tag: String?,
         appointScope: CoroutineScope,
-        dispatcher: CoroutineDispatcher
+        dispatcher: CoroutineDispatcher,
     ): Job {
         val exHandler = CoroutineExceptionHandler { ctx, throwable ->
             val name: String? = ctx[CoroutineName]?.name
             "$throwable ,ctxName:$name ,thread:${Thread.currentThread().name}".log(TAG)
             val transformThrowable = transformHttpException(throwable)
-            if (Looper.myLooper() != Looper.getMainLooper()) {
-                handler.post {
+            //针对UI线程场景发起协程，保持异常回调也回到UI线程
+            if (dispatcher == uiDispatcher) {
+                if (Looper.myLooper() != Looper.getMainLooper()) {
+                    handler.post {
+                        state?.onFailure(tag, transformThrowable)
+                    }
+                } else {
                     state?.onFailure(tag, transformThrowable)
                 }
-            } else {
-                state?.onFailure(tag, transformThrowable)
             }
         }
         val ctx = tag?.let {
