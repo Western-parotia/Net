@@ -42,34 +42,3 @@ internal fun networkIsAvailable(context: Context): Boolean {
     return false
 }
 
-/**
- * 匹配属于 http 的异常，包装为[NetException]返回
- * 如果没有匹配到则返回原始异常
- */
-internal fun transformHttpException(e: Throwable): Throwable {
-    return when (e) {
-        is JSONException,
-        is JsonSyntaxException -> {
-            return NetException.createNormalType("数据解析异常", e)
-        }
-        is HttpException -> {
-            return NetException.createConnectType("Http 异常 code:${e.code()} msg:${e.message()}", e)
-        }
-        is UnknownHostException -> {
-            return NetException.createConnectType("访问的目标主机不存在", e)
-        }
-        is SSLException -> {
-            return NetException.createConnectType("无法与目标主机建立链接", e)
-        }
-        is SocketTimeoutException,
-        is ConnectException -> {
-            return NetException.createConnectType("网络链接异常", e)
-        }
-        is TimeoutException -> {
-            return NetException.createConnectType("网络链接超时", e)
-        }
-        else -> {
-            e
-        }
-    }
-}
