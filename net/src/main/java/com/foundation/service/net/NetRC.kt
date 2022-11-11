@@ -43,59 +43,88 @@ object NetRC {
      * @param appointScope 如果未指定协程 则会创建一个新的[CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)] 协程
      * @return 如果未指定可自动取消的appointScope，则需要自主控制取消
      */
+    @Deprecated(
+        level = DeprecationLevel.WARNING, message = "请使用 uiLaunch(\n" +
+                "        tag: String?,\n" +
+                "        appointScope: CoroutineScope,\n" +
+                "        block: suspend CoroutineScope.() -> Unit）"
+    )
     fun uiLaunch(
         state: NetStateListener?,
         tag: String?,
         appointScope: CoroutineScope,
         block: suspend CoroutineScope.() -> Unit
     ): Job {
-        return launch(block, state, tag, appointScope, uiDispatcher)
+        return launchFuture(block, tag ?: "", appointScope, uiDispatcher).offer(state)
     }
 
     /**
      * 参数同[uiLaunch] 一致，但是回调在子线程
      */
+    @Deprecated(
+        level = DeprecationLevel.WARNING, message = "请使用 ioLaunch(\n" +
+                "        tag: String?,\n" +
+                "        appointScope: CoroutineScope,\n" +
+                "        block: suspend CoroutineScope.() -> Unit）"
+    )
     fun ioLaunch(
         state: NetStateListener?,
         tag: String?,
         appointScope: CoroutineScope,
         block: suspend CoroutineScope.() -> Unit
     ): Job {
-        return launch(block, state, tag, appointScope, ioDispatcher)
+        return launchFuture(block, tag ?: "", appointScope, ioDispatcher).offer(state)
     }
 
-    private fun launch(
+    fun ioLaunch(
+        tag: String,
+        appointScope: CoroutineScope,
+        block: suspend CoroutineScope.() -> Unit
+    ): NetFuture {
+        return launchFuture(block, tag, appointScope, ioDispatcher)
+    }
+
+    fun uiLaunch(
+        tag: String,
+        appointScope: CoroutineScope,
+        block: suspend CoroutineScope.() -> Unit
+    ): NetFuture {
+        return launchFuture(block, tag, appointScope, uiDispatcher)
+    }
+
+    private fun launchFuture(
         block: suspend CoroutineScope.() -> Unit,
-        state: NetStateListener? = null,
-        tag: String?,
+        tag: String,
         appointScope: CoroutineScope,
         dispatcher: CoroutineDispatcher,
-    ): Job {
+    ): NetFuture {
+        val stateProxy = NetStateProxy()
         val exHandler = CoroutineExceptionHandler { ctx, throwable ->
             val name: String? = ctx[CoroutineName]?.name
             "ctxName:$name ,thread:${Thread.currentThread().name},$throwable ".log(TAG)
             val transformThrowable = transformHttpException(throwable)
-            //针对UI线程场景发起协程，保持异常回调也回到UI线程
+            //针对UI线程场景发起协程，保持异常回调也全部回到UI线程
             if (dispatcher == uiDispatcher) {
                 if (Looper.myLooper() != Looper.getMainLooper()) {
                     handler.post {
-                        state?.onFailure(tag, transformThrowable)
+                        stateProxy.onFailure(tag, transformThrowable)
                     }
                 } else {
-                    state?.onFailure(tag, transformThrowable)
+                    stateProxy.onFailure(tag, transformThrowable)
                 }
             }
         }
 
-        val ctx = if (tag.isNullOrEmpty()) exHandler else exHandler + CoroutineName(tag)
-        return appointScope.launch(ctx + dispatcher) {
-            state?.onStart()
+        val ctx = exHandler + CoroutineName(tag)
+        val job = appointScope.launch(ctx + dispatcher, start = CoroutineStart.LAZY) {
+            stateProxy.onStart()
             if (!networkIsAvailable(NetManager.app)) {
                 throw NetException.createNetWorkType("网络链接不可用")
             }
             block.invoke(this)
-            state?.onSuccess()
+            stateProxy.onSuccess()
         }
+        return NetFuture(job, stateProxy)
     }
 
     /**

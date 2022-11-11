@@ -34,6 +34,9 @@ open class NetViewModel : ViewModel() {
         block: suspend CoroutineScope.() -> Unit
     ) = NetRC.uiLaunch(state, tag, viewModelScope, block)
 
+    fun netLaunch(tag: String, block: suspend CoroutineScope.() -> Unit) =
+        NetRC.uiLaunch(tag, viewModelScope, block)
+
     protected suspend fun <T> withResponse(block: suspend () -> Response<T>): T? {
         return NetRC.withResponse(block)
     }

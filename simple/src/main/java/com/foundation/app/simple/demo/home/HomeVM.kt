@@ -6,6 +6,7 @@ import com.foundation.app.simple.demo.base.BaseWanAndroidVM
 import com.foundation.app.simple.demo.home.data.BannerEntity
 import com.foundation.app.simple.demo.home.data.NewsFeedInfo
 import com.foundation.app.simple.demo.net.WanAndroidNetStateHandler
+import com.foundation.service.net.NetStateListener
 
 /**
  *
@@ -33,6 +34,23 @@ class HomeVM : BaseWanAndroidVM() {
                 _bannerData.value = it
             }
         }
+
+        netLaunch("加载banner") {
+            val data = homeRepo.getBanner()
+            data?.let {
+                _bannerData.value = it
+            }
+
+        }.offer(object : NetStateListener {
+            override fun onStart() {
+
+            }
+
+            override fun onSuccess() {
+
+            }
+
+        })
     }
 
     private var pageCount = -1
