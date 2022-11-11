@@ -37,7 +37,7 @@ class HomeActivity : BaseActivity() {
 
         }
         viewBinding.contentLoading.asLoading().setLoadingAdapter(LoadingAdapter(this))
-
+        viewBinding.contentLoading.stop()
         viewBinding.btnInit.setOnClickListener {
             homeVM.loadBanner()
             homeVM.loadNews(true)
@@ -78,6 +78,7 @@ class HomeActivity : BaseActivity() {
         homeVM.newsLiveData.observe(this) {
             adapter.addData(it)
         }
+        homeVM.loadBanner()
 
     }
 

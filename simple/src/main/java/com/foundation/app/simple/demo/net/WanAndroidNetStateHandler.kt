@@ -10,22 +10,17 @@ import com.foundation.service.net.NetStateListener
  * create by zhusw on 5/26/21 14:06
  */
 class WanAndroidNetStateHandler(
-    private val control: Boolean = false,
     private val stateLiveData: MutableLiveData<NetLoadingEvent>
 ) : NetStateListener {
     override fun onStart() {
-        if (control) {
-            stateLiveData.value = NetLoadingEvent.START
-        }
+        stateLiveData.value = NetLoadingEvent.START
     }
 
     override fun onSuccess() {
-        if (control) {
-            stateLiveData.value = NetLoadingEvent.STOP
-        }
+        stateLiveData.value = NetLoadingEvent.STOP
     }
 
-    override fun onFailure(e: Throwable) {
+    override fun onFailure(tagName: String, e: Throwable) {
         handlerNetException(e)
     }
 
