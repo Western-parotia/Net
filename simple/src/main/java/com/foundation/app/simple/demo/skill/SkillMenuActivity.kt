@@ -30,18 +30,7 @@ class SkillMenuActivity : BaseActivity() {
     }
 
     override fun bindData() {
-        runA()
 
-    }
-
-    fun runA() {
-        val ext = CoroutineExceptionHandler { cc, e ->
-            val name: String? = cc[CoroutineName]?.name
-            "ctxName:$name ,thread:${Thread.currentThread().name},$e ".log()
-        }
-        val supervisor = SupervisorJob()
-        CoroutineScope(supervisor + Dispatchers.Main.immediate).launch(ext) {
-        }
     }
 
 

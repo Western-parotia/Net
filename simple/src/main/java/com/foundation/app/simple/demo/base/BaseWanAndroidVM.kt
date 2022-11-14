@@ -32,7 +32,7 @@ open class BaseWanAndroidVM : NetViewModel() {
         }
     }
 
-    fun NetFuture.offerLoading() {
+    fun NetFuture.startWithLoading() {
         start(WanAndroidNetStateHandler(_loadEventLiveData))
     }
 }

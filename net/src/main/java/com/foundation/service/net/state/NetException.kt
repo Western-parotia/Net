@@ -15,7 +15,7 @@ class NetException private constructor(
 ) :
     Throwable(e) {
     companion object {
-        fun createLocalType(msg: String, e: Throwable? = null): NetException {
+        fun createNormalType(msg: String, e: Throwable? = null): NetException {
             return NetException(NetLinkErrorType.CODE_LOCAL, e = e).apply {
                 netMsg = msg
             }

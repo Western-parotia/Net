@@ -1,6 +1,7 @@
 package com.foundation.service.net
 
 import com.foundation.service.net.state.NetException
+import com.foundation.service.net.state.NetStateListener
 import com.foundation.service.net.utils.log
 import com.foundation.service.net.utils.networkIsAvailable
 import com.google.gson.JsonSyntaxException
@@ -101,7 +102,7 @@ internal fun transformHttpException(e: Throwable): Throwable {
     return when (e) {
         is JSONException,
         is JsonSyntaxException -> {
-            return NetException.createLocalType("数据解析异常", e)
+            return NetException.createNormalType("数据解析异常", e)
         }
         is HttpException -> {
             return NetException.createConnectType("Http 异常 code:${e.code()} msg:${e.message()}", e)

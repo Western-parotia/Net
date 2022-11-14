@@ -29,20 +29,33 @@ class HomeVM : BaseWanAndroidVM() {
     val newsLiveData: LiveData<List<NewsFeedInfo>> = _newsLiveData
 
     fun loadBanner() {
-//        netLaunch(WanAndroidNetStateHandler(true, _loadEventLiveData), "加载 banner") {
-//            val data = homeRepo.getBanner()
-//            data?.let {
-//                _bannerData.value = it
-//            }
-//        }
 
         netLaunch("加载banner") {
-
             val data = withBusiness {
                 homeApi.getBanner()
             }
             _bannerData.value = data
-        }.offerLoading()
+        }.onStart {
+
+        }.onSuccess {
+
+        }.onFailure { tagName, e ->
+
+        }.start()
+
+        //-----------------
+
+        netLaunch("加载列表") {
+            _newsLiveData.value = withBusiness {
+                homeApi.getNews(pageCount)
+            }.datas
+        }.start(WanAndroidNetStateHandler(stateLiveData = _loadEventLiveData))
+
+        netLaunch("加载列表") {
+            _newsLiveData.value = withBusiness {
+                homeApi.getNews(pageCount)
+            }.datas
+        }.startWithLoading()
 
     }
 
@@ -58,13 +71,12 @@ class HomeVM : BaseWanAndroidVM() {
         } else {
             pageCount++
         }
-        netLaunch(
-            {
-                _newsLiveData.value = withBusiness {
-                    homeApi.getNews(pageCount)
-                }.datas
-            }, WanAndroidNetStateHandler(stateLiveData = _loadEventLiveData),
-            "加载 列表"
-        )
+
+        netLaunch("加载列表") {
+            _newsLiveData.value = withBusiness {
+                homeApi.getNews(pageCount)
+            }.datas
+        }.start(WanAndroidNetStateHandler(stateLiveData = _loadEventLiveData))
+
     }
 }
