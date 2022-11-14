@@ -110,41 +110,24 @@ NetManager.addDynamicDomainSkill(okhttpBuilder)
 
 
 ```kotlin
-        netLaunch({
-            val data = withBusiness {
-                homeRepo.homeApi.getBanner()
-            }
-            _bannerData.value = data
-        }, WanAndroidNetStateHandler(true, _loadEventLiveData), "加载 banner")
+
+netLaunch("加载banner") {
+    val data = withBusiness {
+        homeApi.getBanner()
+    }
+    _bannerData.value = data
+}.onStart {
+
+}.onSuccess {
+
+}.onFailure { tagName, e ->
+
+}.start()
+
 
 ```
 
 
-* 独立使用
-
-需要调用者管理好appointScope的销毁
-
-```kotlin
- NetRC.uiLaunch({
-                NetRC.withIO {
-                    delay(10_000)
-                }
-                "btnLongTime run finished".log("btnLongTime--")
-            }, object : NetStateListener {
-                override fun onStart() {
-                    "onStart: ".log("btnLongTime--")
-                }
-
-                override fun onSuccess() {
-                    "onSuccess: ".log("btnLongTime--")
-                }
-
-                override fun onFailure(e: Throwable) {
-                    "onFailure: $e".log("btnLongTime--")
-                }
-            }, appointScope = MainScope())
-
-```
 
 ## 三、核心类：
 
@@ -153,41 +136,34 @@ NetManager.addDynamicDomainSkill(okhttpBuilder)
 
 ```kotlin
     /**
-     * 回调在主线程
-     * block 作为匿名协程拓展，具备包含子协程的能力
-     * 但应该完全避免其中包含独立协程（任何情况下，都不应该使用独立协程嵌套，这样会丧失"父子"协程的控制）
-     * [NetStateListener] 作为状态监听器，通常你应该自己实现一个子类，
-     * 统一处理状态满足匹配UI展示需要
-     *
-     * 异常捕获：不管是 withContext(IO) 还是 async(IO) 中发生的异常，最终都会
-     * 在根协程的线程环境获取到异常信息。
-     * @param block
-     * @param state
-     * @param tag
-     * @param appointScope 如果未指定协程 则会创建一个新的[CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)] 协程
-     * @return 如果未指定可自动取消的appointScope，则需要自主控制取消
-     */
-    fun uiLaunch(
-        block: suspend CoroutineScope.() -> Unit,
-        state: NetStateListener? = null,
-        tag: String = "",
-        appointScope: CoroutineScope
-    )
-    
-  /**
-     * 回调在子线程
-     * @param block
-     * @param state
-     * @param tag
-     * @param appointScope
-     * @return
-     */
-    fun ioLaunch(
-        block: suspend CoroutineScope.() -> Unit,
-        state: NetStateListener? = null,
-        tag: String = "",
-        appointScope: CoroutineScope
-    )
+ * 采用惰性启动协程执行任务，掉用NetFuture.start()启动执行
+ *
+ */
+private fun launch(
+    block: suspend CoroutineScope.() -> Unit,
+    tag: String,
+    appointScope: CoroutineScope,
+): NetFuture {
+    val stateProxy = NetStateProxy()
+    val exHandler = CoroutineExceptionHandler { ctx, throwable ->
+        val name: String? = ctx[CoroutineName]?.name
+        "ctxName:$name ,thread:${Thread.currentThread().name},$throwable ".log(TAG)
+        val transformThrowable = transformHttpException(throwable)
+        stateProxy.onFailure(tag, transformThrowable)
+    }
+
+    val ctx = exHandler + CoroutineName(tag)
+    val job = appointScope.launch(ctx, start = CoroutineStart.LAZY) {
+        stateProxy.onStart()
+        if (!networkIsAvailable(NetManager.app)) {
+            throw NetException.createNetWorkType("网络链接不可用")
+        }
+        block.invoke(this)
+        stateProxy.onSuccess()
+    }
+    return NetFuture(job, stateProxy)
+}
+
 ```
 ### 3.2 NetLinkErrorType
 
