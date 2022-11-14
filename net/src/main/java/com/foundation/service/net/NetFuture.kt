@@ -3,9 +3,7 @@ package com.foundation.service.net
 import com.foundation.service.net.state.NetStateListener
 import kotlinx.coroutines.Job
 
-class NetFuture(
-    private val job: Job, private val proxy: NetStateProxy
-) {
+class NetFuture(private val job: Job, private val proxy: NetStateProxy) {
     fun onStart(block: () -> Unit): NetFuture {
         proxy.start = block
         return this
@@ -29,8 +27,7 @@ class NetFuture(
 
 }
 
-class NetStateProxy :
-    NetStateListener {
+class NetStateProxy : NetStateListener {
     var start: (() -> Unit)? = null
     var success: (() -> Unit)? = null
     var failure: ((tagName: String?, e: Throwable) -> Unit)? = null
