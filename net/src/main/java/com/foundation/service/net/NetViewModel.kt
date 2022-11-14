@@ -2,39 +2,18 @@ package com.foundation.service.net
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.foundation.service.net.state.NetStateListener
 import kotlinx.coroutines.CoroutineScope
 import retrofit2.Response
 
 /**
- * 链式处理请求解析 业务>Retrofit>netIo
- * 网络加载状态监听
- * 异常捕获与分类
+ * 自动设置 viewModelScope 作为 网络请求的根协程域
+ * viewModelScope 将自动跟随 ViewModel管理 其中的任务的取消
  * create by zhusw on 5/25/21 15:19
  */
 open class NetViewModel : ViewModel() {
-    private val TAG = "NetViewModel"
 
-    /**
-     * 使用viewModelScope 协程
-     * @return 可自行取消
-     */
-    fun netLaunch(
-        block: suspend CoroutineScope.() -> Unit,
-        state: NetStateListener?,
-        tag: String?
-    ) = NetRC.uiLaunch(state, tag, viewModelScope, block)
-
-    /**
-     * 使用viewModelScope 协程
-     * @return 可自行取消
-     */
-    fun netLaunch(
-        state: NetStateListener?,
-        tag: String?,
-        block: suspend CoroutineScope.() -> Unit
-    ) = NetRC.uiLaunch(state, tag, viewModelScope, block)
-
-    fun netLaunch(tag: String, block: suspend CoroutineScope.() -> Unit) =
+    fun netLaunch(tag: String, block: suspend CoroutineScope.() -> Unit): NetFuture =
         NetRC.uiLaunch(tag, viewModelScope, block)
 
     protected suspend fun <T> withResponse(block: suspend () -> Response<T>): T? {

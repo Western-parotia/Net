@@ -12,7 +12,7 @@ import com.foundation.app.simple.utils.Utils
  *-
  *create by zhusw on 5/19/21 14:04
  */
-private const val TAG = "simple-baseAF"
+private const val TAG = "net_demo"
 internal fun String.log(secTag: String = "") {
     if (BuildConfig.DEBUG) {
         println("$TAG $secTag $this")

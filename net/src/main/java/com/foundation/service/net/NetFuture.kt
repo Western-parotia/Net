@@ -1,5 +1,6 @@
 package com.foundation.service.net
 
+import com.foundation.service.net.state.NetStateListener
 import kotlinx.coroutines.Job
 
 class NetFuture(
@@ -20,12 +21,7 @@ class NetFuture(
         return this
     }
 
-    fun offer(): Job {
-        job.start()
-        return job
-    }
-
-    fun offer(nsl: NetStateListener? = null): Job {
+    fun start(nsl: NetStateListener? = null): Job {
         proxy.nsl = nsl
         job.start()
         return job

@@ -1,13 +1,13 @@
-package com.foundation.service.net
+package com.foundation.service.net.state
 
 /**
- * 网络链路 错误类型
- * 对发生在链路的不同阶段的异常进行区分
+ * 区分网络链路错误类型
+ *
  * create by zhusw on 5/26/21 12:02
  */
 enum class NetLinkErrorType(val value: Int) {
     //默认异常状态，通常是发生在收到网络数据后，处理数据时异常：比如 json 解析出错
-    CODE_NORMAL(-900_0),
+    CODE_LOCAL(-900_0),
 
     //网络不可用
     CODE_NETWORK_OFF(-900_1),

@@ -1,4 +1,4 @@
-package com.foundation.service.net
+package com.foundation.service.net.state
 
 /**
  * 网络请求状态回调

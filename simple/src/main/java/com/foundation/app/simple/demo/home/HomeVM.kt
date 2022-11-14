@@ -8,7 +8,6 @@ import com.foundation.app.simple.demo.home.data.NewsFeedInfo
 import com.foundation.app.simple.demo.net.WanAndroidNetStateHandler
 import com.foundation.app.simple.demo.net.api.WanAndroidService
 import com.foundation.service.net.NetManager
-import com.foundation.service.net.NetStateListener
 import com.foundation.service.net.getApiService
 
 /**

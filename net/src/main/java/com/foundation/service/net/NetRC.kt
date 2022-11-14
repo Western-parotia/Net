@@ -1,7 +1,6 @@
 package com.foundation.service.net
 
-import android.os.Handler
-import android.os.Looper
+import com.foundation.service.net.state.NetException
 import com.foundation.service.net.utils.log
 import com.foundation.service.net.utils.networkIsAvailable
 import com.google.gson.JsonSyntaxException
@@ -22,101 +21,38 @@ import javax.net.ssl.SSLException
  * create by zhusw on 6/4/21 18:10
  */
 object NetRC {
-    private val handler = Handler(Looper.getMainLooper())
 
     private const val TAG = "NetRC"
     private val uiDispatcher = Dispatchers.Main.immediate
     private val ioDispatcher = Dispatchers.IO
 
+    fun uiLaunch(
+        tag: String,
+        appointScope: CoroutineScope,
+        block: suspend CoroutineScope.() -> Unit
+    ): NetFuture {
+        return launch(block, tag, appointScope)
+    }
+
     /**
-     * 回调在主线程
-     * block 作为匿名协程拓展，具备包含子协程的能力
-     * 但应该完全避免其中包含独立协程（任何情况下，都不应该使用独立协程嵌套，这样会丧失"父子"协程的控制）
-     * [NetStateListener] 作为状态监听器，通常你应该自己实现一个子类，
-     * 统一处理状态满足匹配UI展示需要
+     * 采用惰性启动协程执行任务，掉用NetFuture.start()启动执行
      *
-     * 异常捕获：不管是 withContext(IO) 还是 async(IO) 中发生的异常，最终都会
-     * 在根协程的线程环境获取到异常信息。
-     * @param block
-     * @param state
-     * @param tag 此次的协程任务名称
-     * @param appointScope 如果未指定协程 则会创建一个新的[CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)] 协程
-     * @return 如果未指定可自动取消的appointScope，则需要自主控制取消
      */
-    @Deprecated(
-        level = DeprecationLevel.WARNING, message = "请使用 uiLaunch(\n" +
-                "        tag: String?,\n" +
-                "        appointScope: CoroutineScope,\n" +
-                "        block: suspend CoroutineScope.() -> Unit）"
-    )
-    fun uiLaunch(
-        state: NetStateListener?,
-        tag: String?,
-        appointScope: CoroutineScope,
-        block: suspend CoroutineScope.() -> Unit
-    ): Job {
-        return launchFuture(block, tag ?: "", appointScope, uiDispatcher).offer(state)
-    }
-
-    /**
-     * 参数同[uiLaunch] 一致，但是回调在子线程
-     */
-    @Deprecated(
-        level = DeprecationLevel.WARNING, message = "请使用 ioLaunch(\n" +
-                "        tag: String?,\n" +
-                "        appointScope: CoroutineScope,\n" +
-                "        block: suspend CoroutineScope.() -> Unit）"
-    )
-    fun ioLaunch(
-        state: NetStateListener?,
-        tag: String?,
-        appointScope: CoroutineScope,
-        block: suspend CoroutineScope.() -> Unit
-    ): Job {
-        return launchFuture(block, tag ?: "", appointScope, ioDispatcher).offer(state)
-    }
-
-    fun ioLaunch(
-        tag: String,
-        appointScope: CoroutineScope,
-        block: suspend CoroutineScope.() -> Unit
-    ): NetFuture {
-        return launchFuture(block, tag, appointScope, ioDispatcher)
-    }
-
-    fun uiLaunch(
-        tag: String,
-        appointScope: CoroutineScope,
-        block: suspend CoroutineScope.() -> Unit
-    ): NetFuture {
-        return launchFuture(block, tag, appointScope, uiDispatcher)
-    }
-
-    private fun launchFuture(
+    private fun launch(
         block: suspend CoroutineScope.() -> Unit,
         tag: String,
         appointScope: CoroutineScope,
-        dispatcher: CoroutineDispatcher,
     ): NetFuture {
         val stateProxy = NetStateProxy()
         val exHandler = CoroutineExceptionHandler { ctx, throwable ->
             val name: String? = ctx[CoroutineName]?.name
             "ctxName:$name ,thread:${Thread.currentThread().name},$throwable ".log(TAG)
             val transformThrowable = transformHttpException(throwable)
-            //针对UI线程场景发起协程，保持异常回调也全部回到UI线程
-            if (dispatcher == uiDispatcher) {
-                if (Looper.myLooper() != Looper.getMainLooper()) {
-                    handler.post {
-                        stateProxy.onFailure(tag, transformThrowable)
-                    }
-                } else {
-                    stateProxy.onFailure(tag, transformThrowable)
-                }
-            }
+            stateProxy.onFailure(tag, transformThrowable)
         }
 
         val ctx = exHandler + CoroutineName(tag)
-        val job = appointScope.launch(ctx + dispatcher, start = CoroutineStart.LAZY) {
+        val job = appointScope.launch(ctx, start = CoroutineStart.LAZY) {
             stateProxy.onStart()
             if (!networkIsAvailable(NetManager.app)) {
                 throw NetException.createNetWorkType("网络链接不可用")
@@ -128,13 +64,13 @@ object NetRC {
     }
 
     /**
-     * 将过滤网络请求是否成功
+     * 将过滤网络请求是否成功,不成功将通过抛出异常中断请求
      * @param T
      * @param block
      * @return
      */
     suspend fun <T> withResponse(block: suspend () -> Response<T>): T? {
-        val res = withIO(block) //Response<BaseApiResponse<List<YourData>>>
+        val res = withIO(block)
         return when {
             res.isSuccessful -> {
                 res.body()
@@ -144,7 +80,7 @@ object NetRC {
     }
 
     suspend fun <T> withIO(block: suspend () -> T): T {
-        return withContext(ioDispatcher) {//异常信息 将在根协程的线程环境捕获
+        return withContext(ioDispatcher) {//异常信息 将传递到根协程的线程环境中
             block.invoke()
         }
     }
@@ -165,7 +101,7 @@ internal fun transformHttpException(e: Throwable): Throwable {
     return when (e) {
         is JSONException,
         is JsonSyntaxException -> {
-            return NetException.createNormalType("数据解析异常", e)
+            return NetException.createLocalType("数据解析异常", e)
         }
         is HttpException -> {
             return NetException.createConnectType("Http 异常 code:${e.code()} msg:${e.message()}", e)

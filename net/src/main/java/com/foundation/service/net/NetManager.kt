@@ -10,12 +10,13 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  * 网络管理器：init 之后 可获取 apiService
- * 提供接口对象缓存
- * 动态域名替换
+ * 提供service接口对象缓存
+ * 提供统一的动态域名替换接口与变化状态监听
  * create by zhusw on 5/25/21 10:52
  */
-object NetManager : INetManagerSkill {
+object NetManager : IDomainSkill {
 
+    //支持接受多个url变化通知
     private val onUrlChangedList = arrayListOf<OnUrlChanged>()
     private val onUrlChanged = object : OnUrlChanged {
         override fun onUrlChangeBefore(oldUrl: HttpUrl?, domainName: String?) {
@@ -36,8 +37,8 @@ object NetManager : INetManagerSkill {
     internal var debug = BuildConfig.DEBUG
         private set
 
-    private val skill: INetManagerSkill by lazy {
-        UrkSkill(onUrlChanged)
+    private val skill: IDomainSkill by lazy {
+        UrlSkill(onUrlChanged)
     }
 
     private lateinit var retrofit: Retrofit
@@ -72,9 +73,6 @@ object NetManager : INetManagerSkill {
         return loadService(clz)
     }
 
-    /**
-     * 对运行时创建的service对象缓存
-     */
     @Suppress("UNCHECKED_CAST")
     private fun <T : Any> loadService(clz: Class<T>): T {
         var service: Any? = cacheMap[clz]
@@ -118,7 +116,7 @@ inline fun <reified T : Any> NetManager.getApiService(): T {
     return getApiService(T::class.java)
 }
 
-internal class UrkSkill(onUrlChanged: OnUrlChanged) : INetManagerSkill {
+internal class UrlSkill(onUrlChanged: OnUrlChanged) : IDomainSkill {
 
     init {
         RetrofitUrlManager.getInstance().registerUrlChangeListener(onUrlChanged)

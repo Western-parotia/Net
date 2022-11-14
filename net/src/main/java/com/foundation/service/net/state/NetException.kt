@@ -1,4 +1,4 @@
-package com.foundation.service.net
+package com.foundation.service.net.state
 
 import okhttp3.Request
 import okhttp3.ResponseBody
@@ -15,8 +15,8 @@ class NetException private constructor(
 ) :
     Throwable(e) {
     companion object {
-        fun createNormalType(msg: String, e: Throwable? = null): NetException {
-            return NetException(NetLinkErrorType.CODE_NORMAL, e = e).apply {
+        fun createLocalType(msg: String, e: Throwable? = null): NetException {
+            return NetException(NetLinkErrorType.CODE_LOCAL, e = e).apply {
                 netMsg = msg
             }
         }
