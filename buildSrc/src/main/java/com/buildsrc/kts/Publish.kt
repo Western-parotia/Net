@@ -57,8 +57,9 @@ object Publish {
          * 每次修改版本需要sync一下
          */
         private fun autoChangeMDVersion() {
-            var md = File("README.md")
-            if (!md.exists()) md = File("../README.md")
+            // window 默认运行目录是项目磁盘根目录
+            // mac m1 是 /Users/jzxs/.gradle/daemon/6.5/../README.md
+            var md = File(GlobalConfig.rootDirFile, "README.md")
             if (md.exists()) {
                 val text = md.readText()
                 ":$ARTIFACT_ID:.+\"".toRegex()
