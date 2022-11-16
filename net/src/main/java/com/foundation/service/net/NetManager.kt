@@ -32,8 +32,6 @@ object NetManager : IDomainSkill {
         }
     }
 
-    private val lock = Any()
-
     internal var debug = BuildConfig.DEBUG
         private set
 
@@ -77,7 +75,7 @@ object NetManager : IDomainSkill {
     private fun <T : Any> loadService(clz: Class<T>): T {
         var service: Any? = cacheMap[clz]
         if (service == null) {
-            synchronized(lock) {
+            synchronized(NetManager::class) {
                 service = cacheMap[clz]
                 if (service == null) {
                     service = retrofit.create(clz)
