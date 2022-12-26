@@ -62,15 +62,11 @@ tasks.register("createGitTagAndPush", Exec::class.java) {
 })
 
 publishing {
-    val versionName = Publish.Version.versionName
-    val groupId = Publish.Maven.groupId
-    val artifactId = Publish.Maven.artifactId
-
     publications {
         create<MavenPublication>("Net") {
-            setGroupId(groupId)
-            setArtifactId(artifactId)
-            version = versionName
+            groupId = Publish.Maven.getThreePackage(projectDir)
+            artifactId = Publish.Version.artifactId
+            version = Publish.Version.versionName
             artifact(sourceCodeTask)
             afterEvaluate {//在脚本读取完成后绑定
                 val bundleReleaseAarTask: Task = tasks.getByName("bundleReleaseAar")
@@ -93,12 +89,10 @@ publishing {
 
         }
         repositories {
-            maven {
-                setUrl(Publish.Maven.getCodingRepoUrl(project))
-                credentials {
-                    username = Publish.Maven.getCodingMavenUsername(project)
-                    password = Publish.Maven.getCodingMavenPassword(project)
-                }
+            if (Publish.SNAPSHOT) {
+                Publish.Maven.aliyunSnapshotRepositories(this)
+            } else {
+                Publish.Maven.aliyunReleaseRepositories(this)
             }
         }
     }

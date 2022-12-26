@@ -6,15 +6,17 @@ import com.foundation.app.simple.demo.base.BaseWanAndroidVM
 import com.foundation.app.simple.demo.home.data.BannerEntity
 import com.foundation.app.simple.demo.home.data.NewsFeedInfo
 import com.foundation.app.simple.demo.net.WanAndroidNetStateHandler
+import com.foundation.app.simple.demo.net.api.WanAndroidService
+import com.foundation.service.net.NetManager
+import com.foundation.service.net.getApiService
 
 /**
  *
  */
 class HomeVM : BaseWanAndroidVM() {
 
-    private val homeRepo by lazy {
-        HomeRepo()
-    }
+    private val homeApi = NetManager.getApiService<WanAndroidService>()
+
 
     /**
      * 核心架构 思想：保证单一可信源
@@ -27,12 +29,34 @@ class HomeVM : BaseWanAndroidVM() {
     val newsLiveData: LiveData<List<NewsFeedInfo>> = _newsLiveData
 
     fun loadBanner() {
-        netLaunch(WanAndroidNetStateHandler(true, _loadEventLiveData), "加载 banner") {
-            val data = homeRepo.getBanner()
-            data?.let {
-                _bannerData.value = it
+
+        netLaunch("加载banner") {
+            val data = withBusiness {
+                homeApi.getBanner()
             }
-        }
+            _bannerData.value = data
+        }.onStart {
+
+        }.onSuccess {
+
+        }.onFailure { tagName, e ->
+
+        }.start()
+
+        //-----------------
+
+        netLaunch("加载列表") {
+            _newsLiveData.value = withBusiness {
+                homeApi.getNews(pageCount)
+            }.datas
+        }.start(WanAndroidNetStateHandler(stateLiveData = _loadEventLiveData))
+
+        netLaunch("加载列表") {
+            _newsLiveData.value = withBusiness {
+                homeApi.getNews(pageCount)
+            }.datas
+        }.startWithLoading()
+
     }
 
     private var pageCount = -1
@@ -47,14 +71,12 @@ class HomeVM : BaseWanAndroidVM() {
         } else {
             pageCount++
         }
-        netLaunch(
-            {
-                val data = withBusiness {
-                    homeRepo.homeApi.getNews(pageCount)
-                }
-                _newsLiveData.value = data.datas
-            }, WanAndroidNetStateHandler(stateLiveData = _loadEventLiveData),
-            "加载 列表"
-        )
+
+        netLaunch("加载列表") {
+            _newsLiveData.value = withBusiness {
+                homeApi.getNews(pageCount)
+            }.datas
+        }.start(WanAndroidNetStateHandler(stateLiveData = _loadEventLiveData))
+
     }
 }

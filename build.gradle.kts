@@ -1,9 +1,10 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
+//buildSrc的初始化init
+com.buildsrc.kts.GlobalConfig.init(project)
 buildscript {
 
     repositories {
-        google()
-        jcenter()
+        com.buildsrc.kts.Repositories.defRepositories(this)
     }
     dependencies {
         classpath(group = "com.android.tools.build", name = "gradle", version = "4.1.0")
@@ -19,16 +20,7 @@ buildscript {
 
 allprojects {
     repositories {
-        google()
-        jcenter()
-        maven { setUrl("https://jitpack.io") }
-        maven {
-            setUrl(com.buildsrc.kts.Publish.Maven.getCodingRepoUrl(project))
-            credentials {
-                username = com.buildsrc.kts.Publish.Maven.getCodingMavenUsername(project)
-                password = com.buildsrc.kts.Publish.Maven.getCodingMavenPassword(project)
-            }
-        }
+        com.buildsrc.kts.Repositories.defRepositories(this)
     }
 }
 

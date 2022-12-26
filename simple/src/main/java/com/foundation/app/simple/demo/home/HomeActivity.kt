@@ -7,13 +7,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewbinding.ViewBinding
-import com.bumptech.glide.Glide
 import com.foundation.app.simple.architecture.BaseActivity
 import com.foundation.app.simple.databinding.ActHomeWanandroidBinding
 import com.foundation.app.simple.demo.home.data.NewsFeedInfo
-import com.foundation.app.simple.log
 import com.foundation.app.simple.toast
-import com.foundation.service.net.NetLoadingEvent
 import com.foundation.widget.loading.NormalLoadingAdapter
 
 /**
@@ -37,7 +34,7 @@ class HomeActivity : BaseActivity() {
 
         }
         viewBinding.contentLoading.asLoading().setLoadingAdapter(LoadingAdapter(this))
-
+        viewBinding.contentLoading.stop()
         viewBinding.btnInit.setOnClickListener {
             homeVM.loadBanner()
             homeVM.loadNews(true)
@@ -51,33 +48,38 @@ class HomeActivity : BaseActivity() {
     }
 
     override fun bindData() {
-        homeVM.loadEventLiveData.observe(this) {
-            "loadState type :${it.type}".log("net--")
-            when (it.type) {
-                NetLoadingEvent.TYPE_START -> {
-                    viewBinding.contentLoading.asLoading().showLoading()
-                }
-                NetLoadingEvent.TYPE_STOP -> {
-                    viewBinding.contentLoading.asLoading().stop()
-                }
-                NetLoadingEvent.TYPE_ERROR -> {
-                    viewBinding.contentLoading.asLoading().stop()
-                    "${it.msg}:${it.code}".toast()
-                }
-            }
-        }
-        homeVM.bannerData.observe(this) {
-            Glide.with(this).load(it[2].imagePath)
-                .into(viewBinding.ivBanner)
-            viewBinding.tvBannerTitle.text = it[2].title
-        }
-
-        homeVM.cleanAdapterLiveData.observe(this) {
-            adapter.setNewInstance(null)
-        }
-        homeVM.newsLiveData.observe(this) {
-            adapter.addData(it)
-        }
+//        "loadState type :${it.type}".log("net--")
+//
+//        homeVM.loadEventLiveData.observe(this) {
+//            when(it){
+//                NetLoadingEvent.StartEvent
+//            }
+//            when (it.type) {
+//                NetLoadingEvent.TYPE_START -> {
+//                    viewBinding.contentLoading.asLoading().showLoading()
+//                }
+//                NetLoadingEvent.TYPE_STOP -> {
+//                    viewBinding.contentLoading.asLoading().stop()
+//                }
+//                NetLoadingEvent.TYPE_ERROR -> {
+//                    viewBinding.contentLoading.asLoading().stop()
+//                    "${it.msg}:${it.code}".toast()
+//                }
+//            }
+//        }
+//        homeVM.bannerData.observe(this) {
+//            Glide.with(this).load(it[2].imagePath)
+//                .into(viewBinding.ivBanner)
+//            viewBinding.tvBannerTitle.text = it[2].title
+//        }
+//
+//        homeVM.cleanAdapterLiveData.observe(this) {
+//            adapter.setNewInstance(null)
+//        }
+//        homeVM.newsLiveData.observe(this) {
+//            adapter.addData(it)
+//        }
+//        homeVM.loadBanner()
 
     }
 
