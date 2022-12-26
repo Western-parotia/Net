@@ -17,7 +17,7 @@
 引用：
 
 ```kotlin
- implementation("com.foundation.service:net:1.0.6-SNAPSHOT")
+ implementation("com.foundation.service:net:1.0.6")
 ```
 
 基于协程的封装，分层提供异常通知，需要具备协程基础使用的知识。

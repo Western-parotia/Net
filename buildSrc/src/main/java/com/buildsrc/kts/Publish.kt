@@ -15,7 +15,7 @@ import java.io.File
 object Publish {
 
     private const val VERSION = "1.0.6"
-    const val SNAPSHOT = true
+    const val SNAPSHOT = false
     private const val ARTIFACT_ID = "net"
 
     object Version {
