@@ -1,7 +1,6 @@
 package com.foundation.service.net
 
 import com.foundation.service.net.state.NetException
-import com.foundation.service.net.state.NetStateListener
 import com.foundation.service.net.utils.log
 import com.foundation.service.net.utils.networkIsAvailable
 import com.google.gson.JsonSyntaxException
@@ -71,7 +70,7 @@ object NetRC {
      * @return
      */
     suspend fun <T> withResponse(block: suspend () -> Response<T>): T? {
-        val res = withIO(block)
+        val res = block.invoke()
         return when {
             res.isSuccessful -> {
                 res.body()

@@ -1,2 +1,2 @@
-//include(":net")
-//include(":simple")
+include(":net")
+include(":simple")
