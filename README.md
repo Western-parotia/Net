@@ -5,7 +5,7 @@
 核心功能：
 
 * 1.service快速创建（带缓存）
-* 2.NetViewModel，网络状态拦截，数据状态拦截，数据分层解析，异常分层捕获
+* 2.提供NetViewModel衔接网络状态拦截，数据分层解析，异常分层捕获。在框架层面避免数据逻辑代码冗余到View层
 * 3.域名切换 包含静态多域名 与动态多域名
 * 4.提供流式API
 
@@ -116,8 +116,8 @@ private fun launch(
 ### 2 NetLinkErrorType
 
 ```kotlin
-    //默认异常状态，通常是发生在收到网络数据后，处理数据时异常：比如 json 解析出错
-    CODE_NORMAL(-900_0),
+//默认异常状态，通常是发生在收到网络数据后，处理数据时异常：比如 json 解析出错
+CODE_NORMAL(-900_0),
 
 //网络不可用
 CODE_NETWORK_OFF(-900_1),
