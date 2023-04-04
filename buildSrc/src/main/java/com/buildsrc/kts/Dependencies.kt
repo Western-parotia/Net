@@ -10,11 +10,11 @@ object Dependencies {
 
 
     object Foundation {
-        const val loading = "com.foundation.widget:loadingview:1.1.9"
+        const val loading = "com.foundation.widget:loadingview:1.5.0"
     }
 
     object Kotlin {
-        const val version = "1.4.32"
+        const val version = "1.6.21"
 
         /**
          * kotlin 语言核心库，像 let这种操作域拓展

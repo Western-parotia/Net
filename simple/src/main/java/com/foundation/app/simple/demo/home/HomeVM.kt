@@ -33,29 +33,21 @@ class HomeVM : BaseWanAndroidVM() {
         netLaunch("加载banner") {
             val data = withBusiness {
                 homeApi.getBanner()
-            }
+            }.toList()
             _bannerData.value = data
-        }.onStart {
+        }.onStart { //API 演示代码
 
         }.onSuccess {
 
         }.onFailure { tagName, e ->
 
-        }.start()
-
-        //-----------------
-
-        netLaunch("加载列表") {
-            _newsLiveData.value = withBusiness {
-                homeApi.getNews(pageCount)
-            }.datas
         }.start(WanAndroidNetStateHandler(stateLiveData = _loadEventLiveData))
-
+        //API 演示代码
         netLaunch("加载列表") {
             _newsLiveData.value = withBusiness {
                 homeApi.getNews(pageCount)
             }.datas
-        }.startWithLoading()
+        }.start()
 
     }
 
