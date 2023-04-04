@@ -6,7 +6,7 @@
 核心功能：
 
 * 1.service快速创建（带缓存）
-* 2.NetViewModel，网络状态拦截，数据状态拦截，异常捕获 
+* 2.NetViewModel，网络状态拦截，数据状态拦截，数据分层解析，异常分层捕获
 * 3.域名切换 包含静态多域名 与动态多域名
 * 4.提供流式API
 
@@ -18,6 +18,14 @@
 
 ```kotlin
  implementation("com.foundation.service:net:1.0.6")
+```
+
+```agsl
+# 仓库：（暂时还未迁移至中央Maven仓库）
+https://packages.aliyun.com/maven/repository/2196753-release-jjUEtd/
+# 访问权限账户密钥：
+账号：642b9f209f62bf75b33fc1ae
+密码：EkNR7ao]bCHh
 ```
 
 基于协程的封装，分层提供异常通知，需要具备协程基础使用的知识。
@@ -47,8 +55,7 @@
     suspend fun getBanner(): Response<BaseApiResponse<List<BannerEntity>>>
 ```
 
-
-* 3、在NetViewModle子类中加载数据
+* 3、在NetViewModel子类中加载数据
 
 
 ```kotlin
@@ -66,7 +73,7 @@ netLaunch("加载banner") {
 
 }.start()
 //也支持一次性接管全部状态
-    .start(your listener)
+//.start(your listener)
 
 ```
 
@@ -76,7 +83,7 @@ netLaunch("加载banner") {
 网络请求
 
 ```kotlin
-    /**
+/**
  * 采用惰性启动协程执行任务，掉用NetFuture.start()启动执行
  *
  */
