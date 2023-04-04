@@ -10,16 +10,12 @@ import com.foundation.app.simple.demo.net.api.WanAndroidService
 import com.foundation.service.net.NetManager
 import com.foundation.service.net.getApiService
 
-/**
- *
- */
 class HomeVM : BaseWanAndroidVM() {
 
     private val homeApi = NetManager.getApiService<WanAndroidService>()
 
-
     /**
-     * 核心架构 思想：保证单一可信源
+     * 核心架构 思想：保证单一数据源
      * view层只能订阅状态，不可修改状态
      */
     private val _bannerData = MutableLiveData<List<BannerEntity>>()

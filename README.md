@@ -1,7 +1,6 @@
 # NET Library
 
-基于kotlin+协程封装的网络请求库。结合NetViewModel获取请求状态监听，状态判断。分层处理业务数据。
-
+基于kotlin 协程+ViewModel封装的网络请求库。
 
 核心功能：
 
@@ -10,36 +9,36 @@
 * 3.域名切换 包含静态多域名 与动态多域名
 * 4.提供流式API
 
-功能结构图：
+## 更新日志：
 
-![结构图](images/function_structure.jpg) 
+* 1.0.6 更新：协程启动方式从立即启动改为惰性启动，需要主动掉用start()
 
-引用：
+## 引用：
 
 ```kotlin
  implementation("com.foundation.service:net:1.0.6")
 ```
 
 ```agsl
-# 仓库：（暂时还未迁移至中央Maven仓库）
+仓库：（暂时还未迁移至中央Maven仓库）
 https://packages.aliyun.com/maven/repository/2196753-release-jjUEtd/
-# 访问权限账户密钥：
+访问权限账户密钥：
 账号：642b9f209f62bf75b33fc1ae
 密码：EkNR7ao]bCHh
 ```
 
-基于协程的封装，分层提供异常通知，需要具备协程基础使用的知识。
+## 功能结构图：
 
-会创建协程，会切分线程即可。
-
-* 1.0.6 更新：协程启动方式从立即启动改为惰性启动，需要主动掉用start()
+![结构图](images/function_structure.jpg)
 
 # 网络请求使用示例：
+
+> 演示类：com.foundation.app.simple.demo.home.HomeActivity
 
 * 1、初始化
 
 ```kotlin
-        val okHttpClient =  OkHttpClient.Builder().addDynamicDomainSkill()
+        val okHttpClient = OkHttpClient.Builder().addDynamicDomainSkill()
             .build()
         val retrofit = Retrofit.Builder()
             .client( okHttpClient)
