@@ -1,16 +1,13 @@
-# NET Library
-
+# 简介
 基于kotlin 协程+ViewModel封装的网络请求库。
 
-核心功能：
-
+## 核心功能：
 * 1.service快速创建（带缓存）
 * 2.提供NetViewModel衔接网络状态拦截，数据分层解析，异常分层捕获。在框架层面避免数据逻辑代码冗余到View层
 * 3.域名切换 包含静态多域名 与动态多域名
 * 4.提供流式API
 
 ## 更新日志：
-
 * 1.0.6 更新：协程启动方式从立即启动改为惰性启动，需要主动掉用start()
 
 ## 引用：
@@ -26,12 +23,11 @@ https://packages.aliyun.com/maven/repository/2196753-release-jjUEtd/
 账号：642b9f209f62bf75b33fc1ae
 密码：EkNR7ao]bCHh
 ```
-
 ## 功能结构图：
 
 ![结构图](images/function_structure.jpg)
 
-# 网络请求使用示例：
+# 使用示例：
 
 > 演示类：com.foundation.app.simple.demo.home.HomeActivity
 
